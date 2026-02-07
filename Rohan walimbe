@@ -1,0 +1,61 @@
+import yfinance as yf
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def download_market_data():
+    # Defining the Tickers (Yahoo Finance symbols)
+    tickers = {
+        "SENSEX": "^BSESN",
+        "NIFTY50": "^NSEI",
+        "BANKNIFTY": "^NSEBANK"
+    }
+    
+    # Date range: Jan 1992 to Feb 2025
+    start_date = "1992-01-20"
+    end_date = "2025-02-07"
+    
+    data_frames = {}
+
+    print("--- Fetching Historical Data ---")
+    for name, symbol in tickers.items():
+        print(f"Downloading {name}...")
+        df = yf.download(symbol, start=start_date, end=end_date)
+        if not df.empty:
+            data_frames[name] = df
+            # Save to CSV for your psychological study
+            df.to_csv(f"{name}_historical_data.csv")
+            print(f"Saved {len(df)} rows for {name} to CSV.")
+        else:
+            print(f"No data found for {name} in this range.")
+            
+    return data_frames
+
+def plot_psychology(data_frames):
+    plt.figure(figsize=(14, 7))
+    
+    for name, df in data_frames.items():
+        # Normalize data to start at 100 for better psychological comparison
+        # (Growth comparison regardless of index value)
+        if 'Close' in df.columns:
+            initial_val = df['Close'].iloc[0]
+            normalized_series = (df['Close'] / initial_val) * 100
+            plt.plot(normalized_series, label=f"{name} (Relative Growth)")
+
+    plt.title("Market Psychology: Relative Growth Comparison (1992-2025)", fontsize=16)
+    plt.xlabel("Year")
+    plt.ylabel("Value (Normalized to 100)")
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.7)
+    
+    # Highlighting psychological 'Pain' zones (Example: 2008 Crash)
+    plt.axvspan('2008-01-01', '2009-01-01', color='red', alpha=0.2, label='Panic Zone (2008)')
+    plt.axvspan('2020-02-01', '2020-06-01', color='orange', alpha=0.2, label='Black Swan (COVID)')
+    
+    plt.show()
+
+if __name__ == "__main__":
+    # Ensure you have yfinance and matplotlib installed:
+    # pip install yfinance matplotlib pandas
+    all_data = download_market_data()
+    if all_data:
+        plot_psychology(all_data)
