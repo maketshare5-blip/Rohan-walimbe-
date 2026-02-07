@@ -1,0 +1,40 @@
+col1, col2, col3 = st.columns([1, 1, 1.2])
+
+with col1:
+    st.subheader("🪐 Planet Degrees")
+    # List comprehension for clean data
+    p_list = [{"Planet": obj.id, "Sign": obj.sign, "Deg": round(obj.angle, 2)} for obj in chart.objects]
+    st.dataframe(p_list, use_container_width=True)
+
+with col2:
+    st.subheader("📊 Chart Visualization")
+    fig, ax = plt.subplots(figsize=(5, 5))
+    # Logic for Diamond Chart
+    ax.plot([0, 5, 10, 5, 0], [5, 10, 5, 0, 5], color='darkorange', lw=3)
+    ax.plot([0, 10], [10, 0], color='gray', alpha=0.3)
+    ax.plot([0, 10], [0, 10], color='gray', alpha=0.3)
+    
+    lagna = chart.get(chart.ASC)
+    ax.text(5, 5.5, f"{lagna.sign}", fontsize=15, ha='center', fontweight='bold')
+    ax.text(5, 4.5, "1st House", fontsize=8, ha='center', color='gray')
+    ax.axis('off')
+    st.pyplot(fig)
+
+with col3:
+    st.subheader("🧠 Trading Psychology Insight")
+    
+    # Simple Logic: Moon represents Mind (Psychology)
+    moon = chart.get('Moon')
+    mercury = chart.get('Mercury') # Logic/Calculation
+    
+    # Analyzing Mercury (Trading/Broking/Logic)
+    if mercury.sign in ['Gemini', 'Virgo']:
+        st.success("✅ **Strong Logic:** Today is good for data-driven decisions.")
+    elif mercury.sign in ['Pisces']:
+        st.warning("⚠️ **Confused Mind:** Mercury is weak. Avoid over-trading.")
+
+    # Psychology Tip based on Moon
+    st.info(f"**Current Mindset:** Your Moon is in {moon.sign}. Manage your emotions accordingly.")
+    
+    # Adding a Gauge for Risk (Static example, can be calculated)
+    st.metric("Market Volatility Score", "Medium", "+5%")
